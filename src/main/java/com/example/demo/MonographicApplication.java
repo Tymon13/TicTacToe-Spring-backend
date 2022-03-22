@@ -6,8 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class MonographicApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(MonographicApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(MonographicApplication.class, args);
+    }
 
 }
