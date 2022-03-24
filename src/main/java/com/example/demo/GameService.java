@@ -4,31 +4,30 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class GameService {
-    private final GameDao game;
+    private final GameProvider gameProvider;
     private static final int WIN_CONDITION = 5;
 
-    GameService(GameDao game) {
-        this.game = game;
+    public GameService(GameProvider gameProvider) {
+        this.gameProvider = gameProvider;
     }
 
-    public void beginNewGame() throws GameAlreadyExistsException {
-        if (game.gameInProgress()) {
-            throw new GameAlreadyExistsException();
-        }
-        game.beginNewGame();
+    public int beginNewGame() {
+        return gameProvider.makeNewGame();
     }
 
-    public void playNextMove(Player p, int x, int y) throws GameDoesntExistException, IllegalMoveException {
+    public void playNextMove(int gameId, Player p, int x, int y) throws GameDoesntExistException, IllegalMoveException {
+        GameDao game = gameProvider.getExistingGame(gameId);
         if (!game.gameInProgress()) {
             throw new GameDoesntExistException();
         }
         if (game.getAtXY(x, y) != null) {
             throw new IllegalMoveException();
         }
-        this.game.setAtXY(p, x, y);
+        game.setAtXY(p, x, y);
     }
 
-    public Player checkWinner() {
+    public Player checkWinner(int gameId) throws GameDoesntExistException {
+        GameDao game = gameProvider.getExistingGame(gameId);
         Player[][] gameState = game.getGameState();
 
         Player winner = checkWinner(gameState);
@@ -39,7 +38,7 @@ public class GameService {
     }
 
     private Player checkWinner(Player[][] gameState) {
-        Player winner = null;
+        Player winner;
         if ((winner = checkWinnerInRows(gameState)) != null) {
             return winner;
         }
