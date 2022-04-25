@@ -11,18 +11,18 @@ public class PlayerController {
     }
 
     @PostMapping(path = "/player/new")
-    public PlayerEntity addPlayer(@RequestParam String name) {
+    public PlayerEntity addPlayer(@RequestParam String name) throws PlayerDoesntExist {
         int id = playerService.add(name);
         return playerService.get(id);
     }
 
     @GetMapping(path = "/player/{id}")
-    public PlayerEntity getPlayer(@PathVariable int id) {
+    public PlayerEntity getPlayer(@PathVariable int id) throws PlayerDoesntExist {
         return playerService.get(id);
     }
 
-//    @GetMapping(path = "/player/{id}/stats}")
-//    public PlayerStats getPlayerStats(@PathVariable int id) {
-//        return playerService.getStats(id);
-//    }
+    @GetMapping(path = "/player/{id}/stats}")
+    public PlayerStats getPlayerStats(@PathVariable int id) throws PlayerDoesntExist {
+        return playerService.getStats(id);
+    }
 }
