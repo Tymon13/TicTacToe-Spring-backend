@@ -11,13 +11,18 @@ public class PlayerController {
     }
 
     @PostMapping(path = "/player/new")
-    public Player addPlayer(@RequestParam String name) {
+    public PlayerEntity addPlayer(@RequestParam String name) {
         int id = playerService.add(name);
         return playerService.get(id);
     }
 
-    @GetMapping(path = "/player/{id}}")
-    public Player getPlayer(@PathVariable int id) {
+    @GetMapping(path = "/player/{id}")
+    public PlayerEntity getPlayer(@PathVariable int id) {
         return playerService.get(id);
     }
+
+//    @GetMapping(path = "/player/{id}/stats}")
+//    public PlayerStats getPlayerStats(@PathVariable int id) {
+//        return playerService.getStats(id);
+//    }
 }
