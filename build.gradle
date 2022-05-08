@@ -2,6 +2,7 @@ plugins {
 	id 'org.springframework.boot' version '2.6.4'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 	id 'java'
+	id "com.github.spotbugs" version "5.0.6"
 }
 
 group = 'com.example'
@@ -26,8 +27,32 @@ dependencies {
 	runtimeOnly 'com.h2database:h2:2.1.210'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+	spotbugs 'com.github.spotbugs:spotbugs:4.6.0'
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+task hello_world {
+	doLast {
+		print 'Hello'
+	}
+}
+
+description ="""
+Ultimate Tic-Tac-Toe
+Play through the Internet on a 10x10 board
+First to get 5 in a row wins
+"""
+
+// implementation - when target is included in other project, this dependency is visible at runtime only
+// api - when target is included in other project, this dependency is visible at compile and runtime. Any change in api
+// requires recompilation of every project dependant on that api
+// compileOnly - required at compile time, not required at runtime. Can reduce executable size
+// runtimeOnly - required at runtime, not required at compile time. Dynamically loaded classes?
+// annotationProcessor - required for annotation processors
+// testImplementation - implementation, but for test targets
+// compile - deprecated, use api if needed
+// testCompile - deprecated, use testImplementation
