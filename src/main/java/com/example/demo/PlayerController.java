@@ -21,7 +21,7 @@ public class PlayerController {
         return playerService.get(id);
     }
 
-    @GetMapping(path = "/player/{id}/stats}")
+    @GetMapping(path = "/player/{id}/stats")
     public PlayerStats getPlayerStats(@PathVariable int id) throws PlayerDoesntExist {
         return playerService.getStats(id);
     }
