@@ -1,6 +1,7 @@
 package com.example.demo;
 
 import com.sun.istack.NotNull;
+import com.sun.istack.Nullable;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -20,5 +21,6 @@ public class GameCompletionEntity {
     private GameStateEntity game;
 
     @OneToOne
+    @Nullable
     private PlayerEntity winner;
 }
