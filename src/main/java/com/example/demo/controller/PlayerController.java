@@ -15,9 +15,8 @@ public class PlayerController {
     }
 
     @PostMapping(path = "/player/new")
-    public PlayerEntity addPlayer(@RequestParam String name) throws PlayerDoesntExist {
-        int id = playerService.add(name);
-        return playerService.get(id);
+    public PlayerEntity addPlayer(@RequestParam String name) {
+        return playerService.add(name);
     }
 
     @GetMapping(path = "/player/{id}")

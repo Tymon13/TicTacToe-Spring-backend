@@ -28,11 +28,11 @@ public class PlayerService {
         this.gameCompletionRepository = gameCompletionRepository;
     }
 
-    public int add(String name) {
+    public PlayerEntity add(String name) {
         PlayerEntity player = new PlayerEntity();
         player.setName(name);
         player = playerRepository.saveAndFlush(player);
-        return player.getId();
+        return player;
     }
 
     public PlayerEntity get(int id) throws PlayerDoesntExist {
