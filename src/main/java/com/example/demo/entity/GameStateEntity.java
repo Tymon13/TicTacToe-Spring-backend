@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.example.demo.entity;
 
 import com.sun.istack.NotNull;
 import com.sun.istack.Nullable;
@@ -10,17 +10,23 @@ import javax.persistence.*;
 @Data
 @Entity
 @NoArgsConstructor
-@Table(name = "game_completion")
-public class GameCompletionEntity {
+@Table(name = "game_state")
+public class GameStateEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @NotNull
-    @OneToOne
-    private GameStateEntity game;
+    @Column(length = 100)
+    private String data;
 
     @OneToOne
     @Nullable
-    private PlayerEntity winner;
+    private GameCompletionEntity completion;
+
+    @OneToOne
+    private PlayerEntity player1;
+
+    @OneToOne
+    private PlayerEntity player2;
 }

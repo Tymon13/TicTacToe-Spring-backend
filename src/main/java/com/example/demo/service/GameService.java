@@ -1,5 +1,8 @@
-package com.example.demo;
+package com.example.demo.service;
 
+import com.example.demo.*;
+import com.example.demo.exception.GameDoesntExistException;
+import com.example.demo.exception.IllegalMoveException;
 import org.springframework.stereotype.Service;
 
 @Service

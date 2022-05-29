@@ -1,5 +1,8 @@
 package com.example.demo;
 
+import com.example.demo.exception.GameDoesntExistException;
+import com.example.demo.exception.IllegalMoveException;
+import com.example.demo.service.GameService;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

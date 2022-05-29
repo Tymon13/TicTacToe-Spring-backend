@@ -1,5 +1,7 @@
-package com.example.demo;
+package com.example.demo.entity;
 
+import com.example.demo.entity.GameStateEntity;
+import com.example.demo.entity.PlayerEntity;
 import com.sun.istack.NotNull;
 import com.sun.istack.Nullable;
 import lombok.Data;
@@ -10,23 +12,17 @@ import javax.persistence.*;
 @Data
 @Entity
 @NoArgsConstructor
-@Table(name = "game_state")
-public class GameStateEntity {
+@Table(name = "game_completion")
+public class GameCompletionEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @NotNull
-    @Column(length = 100)
-    private String data;
+    @OneToOne
+    private GameStateEntity game;
 
     @OneToOne
     @Nullable
-    private GameCompletionEntity completion;
-
-    @OneToOne
-    private PlayerEntity player1;
-
-    @OneToOne
-    private PlayerEntity player2;
+    private PlayerEntity winner;
 }

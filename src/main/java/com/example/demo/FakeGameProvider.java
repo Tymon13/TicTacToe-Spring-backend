@@ -1,5 +1,6 @@
 package com.example.demo;
 
+import com.example.demo.exception.GameDoesntExistException;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collections;

@@ -1,5 +1,13 @@
-package com.example.demo;
+package com.example.demo.service;
 
+import com.example.demo.dto.PlayerStatsDto;
+import com.example.demo.entity.GameCompletionEntity;
+import com.example.demo.entity.GameStateEntity;
+import com.example.demo.entity.PlayerEntity;
+import com.example.demo.exception.PlayerDoesntExist;
+import com.example.demo.repository.GameCompletionRepository;
+import com.example.demo.repository.GameStateRepository;
+import com.example.demo.repository.PlayerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -35,7 +43,7 @@ public class PlayerService {
             throw new PlayerDoesntExist();
     }
 
-    public PlayerStats getStats(int id) throws PlayerDoesntExist {
+    public PlayerStatsDto getStats(int id) throws PlayerDoesntExist {
         Optional<PlayerEntity> optional = playerRepository.findById(id);
         if (optional.isEmpty())
             throw new PlayerDoesntExist();
@@ -56,6 +64,6 @@ public class PlayerService {
             }
         }
 
-        return new PlayerStats(player.getId(), wins, losses, draws);
+        return new PlayerStatsDto(player.getId(), wins, losses, draws);
     }
 }
