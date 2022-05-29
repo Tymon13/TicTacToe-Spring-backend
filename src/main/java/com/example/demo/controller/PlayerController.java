@@ -1,7 +1,7 @@
 package com.example.demo.controller;
 
+import com.example.demo.dto.PlayerDto;
 import com.example.demo.exception.PlayerDoesntExist;
-import com.example.demo.entity.PlayerEntity;
 import com.example.demo.service.PlayerService;
 import com.example.demo.dto.PlayerStatsDto;
 import org.springframework.web.bind.annotation.*;
@@ -15,12 +15,12 @@ public class PlayerController {
     }
 
     @PostMapping(path = "/player/new")
-    public PlayerEntity addPlayer(@RequestParam String name) {
+    public PlayerDto addPlayer(@RequestParam String name) {
         return playerService.add(name);
     }
 
     @GetMapping(path = "/player/{id}")
-    public PlayerEntity getPlayer(@PathVariable int id) throws PlayerDoesntExist {
+    public PlayerDto getPlayer(@PathVariable int id) throws PlayerDoesntExist {
         return playerService.get(id);
     }
 

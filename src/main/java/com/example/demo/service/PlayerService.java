@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import com.example.demo.dto.PlayerDto;
 import com.example.demo.dto.PlayerStatsDto;
 import com.example.demo.entity.GameCompletionEntity;
 import com.example.demo.entity.GameStateEntity;
@@ -28,17 +29,17 @@ public class PlayerService {
         this.gameCompletionRepository = gameCompletionRepository;
     }
 
-    public PlayerEntity add(String name) {
+    public PlayerDto add(String name) {
         PlayerEntity player = new PlayerEntity();
         player.setName(name);
         player = playerRepository.saveAndFlush(player);
-        return player;
+        return new PlayerDto(player.getId(), player.getName());
     }
 
-    public PlayerEntity get(int id) throws PlayerDoesntExist {
+    public PlayerDto get(int id) throws PlayerDoesntExist {
         Optional<PlayerEntity> optional = playerRepository.findById(id);
         if (optional.isPresent())
-            return optional.get();
+            return new PlayerDto(optional.get().getId(), optional.get().getName());
         else
             throw new PlayerDoesntExist();
     }
