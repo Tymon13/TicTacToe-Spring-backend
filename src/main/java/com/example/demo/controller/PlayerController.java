@@ -4,6 +4,7 @@ import com.example.demo.dto.PlayerDto;
 import com.example.demo.exception.PlayerDoesntExist;
 import com.example.demo.service.PlayerService;
 import com.example.demo.dto.PlayerStatsDto;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -27,5 +28,10 @@ public class PlayerController {
     @GetMapping(path = "/player/{id}/stats")
     public PlayerStatsDto getPlayerStats(@PathVariable int id) throws PlayerDoesntExist {
         return playerService.getStats(id);
+    }
+
+    @ExceptionHandler(PlayerDoesntExist.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public void playerDoesntExistHandler() {
     }
 }
