@@ -38,16 +38,18 @@ public class PlayerService {
 
     public PlayerDto get(int id) throws PlayerDoesntExist {
         Optional<PlayerEntity> optional = playerRepository.findById(id);
-        if (optional.isPresent())
+        if (optional.isPresent()) {
             return new PlayerDto(optional.get().getId(), optional.get().getName());
-        else
+        } else {
             throw new PlayerDoesntExist();
+        }
     }
 
     public PlayerStatsDto getStats(int id) throws PlayerDoesntExist {
         Optional<PlayerEntity> optional = playerRepository.findById(id);
-        if (optional.isEmpty())
+        if (optional.isEmpty()) {
             throw new PlayerDoesntExist();
+        }
         PlayerEntity player = optional.get();
         List<GameStateEntity> gamesWithPlayer = gameStateRepository.findAllByPlayer1OrPlayer2(player);
         List<GameCompletionEntity> completions = gameCompletionRepository.getAllByGameIn(gamesWithPlayer);
@@ -55,7 +57,7 @@ public class PlayerService {
         int wins = 0;
         int losses = 0;
         int draws = 0;
-        for(GameCompletionEntity completion: completions) {
+        for (GameCompletionEntity completion : completions) {
             if (completion.getWinner() == player) {
                 wins++;
             } else if (completion.getWinner() == null) {

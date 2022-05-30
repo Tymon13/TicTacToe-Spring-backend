@@ -1,6 +1,8 @@
 package com.example.demo.service;
 
-import com.example.demo.*;
+import com.example.demo.GameDao;
+import com.example.demo.GameProvider;
+import com.example.demo.Player;
 import com.example.demo.exception.GameDoesntExistException;
 import com.example.demo.exception.IllegalMoveException;
 import org.springframework.stereotype.Service;
@@ -113,7 +115,7 @@ public class GameService {
 
     private Player checkWinnerInOppositeDiagonals(Player[][] gameState) {
         for (int i = gameState.length - 1; i > WIN_CONDITION - 1; i--) {
-            for (int j = 0; j < gameState[i].length - WIN_CONDITION + 1 ; j++) {
+            for (int j = 0; j < gameState[i].length - WIN_CONDITION + 1; j++) {
                 if (gameState[i][j] != null) {
                     Player currentCheck = gameState[i][j];
                     int currentCount = 1;

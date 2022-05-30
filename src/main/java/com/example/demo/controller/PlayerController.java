@@ -1,9 +1,9 @@
 package com.example.demo.controller;
 
 import com.example.demo.dto.PlayerDto;
+import com.example.demo.dto.PlayerStatsDto;
 import com.example.demo.exception.PlayerDoesntExist;
 import com.example.demo.service.PlayerService;
-import com.example.demo.dto.PlayerStatsDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 

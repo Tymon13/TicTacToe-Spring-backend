@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.sql.Blob;
+import java.util.List;
 
 @Data
 @Entity
@@ -17,8 +19,11 @@ public class GameStateEntity {
     private int id;
 
     @NotNull
-    @Column(length = 100)
+    @Column(length = 600)
     private String data;
+
+    @Lob
+    private byte[] d;
 
     @OneToOne
     @Nullable

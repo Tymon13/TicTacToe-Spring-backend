@@ -1,11 +1,10 @@
 package com.example.demo.controller;
 
-import com.example.demo.*;
+import com.example.demo.Player;
 import com.example.demo.dto.GameIdDto;
 import com.example.demo.exception.GameDoesntExistException;
 import com.example.demo.exception.IllegalMoveException;
 import com.example.demo.service.GameService;
-import lombok.extern.java.Log;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 

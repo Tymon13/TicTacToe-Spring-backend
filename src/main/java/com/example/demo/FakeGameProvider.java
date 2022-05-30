@@ -10,6 +10,7 @@ import java.util.Map;
 @Repository
 public class FakeGameProvider implements GameProvider {
     private static final Map<Integer, GameDao> existingGames = new HashMap<>();
+
     @Override
     public int makeNewGame() {
         int nextId;

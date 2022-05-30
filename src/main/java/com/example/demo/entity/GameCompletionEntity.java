@@ -1,7 +1,5 @@
 package com.example.demo.entity;
 
-import com.example.demo.entity.GameStateEntity;
-import com.example.demo.entity.PlayerEntity;
 import com.sun.istack.NotNull;
 import com.sun.istack.Nullable;
 import lombok.Data;
