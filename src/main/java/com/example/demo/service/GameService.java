@@ -2,12 +2,14 @@ package com.example.demo.service;
 
 import com.example.demo.dto.GameIdDto;
 import com.example.demo.dto.GameWinnerDto;
+import com.example.demo.entity.GameCompletionEntity;
 import com.example.demo.entity.GameStateEntity;
 import com.example.demo.entity.PlayerEntity;
 import com.example.demo.exception.GameDoesntExistException;
 import com.example.demo.exception.IllegalMoveException;
 import com.example.demo.exception.InternalErrorException;
 import com.example.demo.exception.PlayerDoesntExist;
+import com.example.demo.repository.GameCompletionRepository;
 import com.example.demo.repository.GameStateRepository;
 import com.example.demo.repository.PlayerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,11 +23,14 @@ public class GameService {
     private static final int WIN_CONDITION = 5;
     private final GameStateRepository gameStateRepository;
     private final PlayerRepository playerRepository;
+    private final GameCompletionRepository gameCompletionRepository;
 
     @Autowired
-    public GameService(GameStateRepository gameStateRepository, PlayerRepository playerRepository) {
+    public GameService(GameStateRepository gameStateRepository, PlayerRepository playerRepository,
+                       GameCompletionRepository gameCompletionRepository) {
         this.gameStateRepository = gameStateRepository;
         this.playerRepository = playerRepository;
+        this.gameCompletionRepository = gameCompletionRepository;
     }
 
     public GameIdDto beginNewGame(int player1Id, int player2Id) throws InternalErrorException, PlayerDoesntExist {
@@ -54,13 +59,16 @@ public class GameService {
         if (playerId != gameStateEntity.getPlayer1().getId() && playerId != gameStateEntity.getPlayer2().getId()) {
             throw new IllegalMoveException();
         }
+        if(gameStateEntity.getCompletion() != null) {
+            throw new IllegalMoveException();
+        }
 
-        int[][] gameState = decodeGameState(gameStateEntity.getD());
+        int[][] gameState = decodeGameState(gameStateEntity.getData());
         if (gameState[x][y] != 0) {
             throw new IllegalMoveException();
         }
         gameState[x][y] = playerId;
-        gameStateEntity.setD(encodeGameState(gameState));
+        gameStateEntity.setData(encodeGameState(gameState));
         gameStateRepository.save(gameStateEntity);
     }
 
@@ -89,11 +97,22 @@ public class GameService {
             throw new GameDoesntExistException();
         }
         GameStateEntity gameStateEntity = gameStateEntityOptional.get();
-        int[][] gameState = decodeGameState(gameStateEntity.getD());
+        int[][] gameState = decodeGameState(gameStateEntity.getData());
 
 
         int winner = checkWinner(gameState);
+
         if (winner != 0) {
+            Optional<PlayerEntity> playerEntityOptional = playerRepository.findById(winner);
+            if(playerEntityOptional.isEmpty()) {
+                throw new InternalErrorException();
+            }
+
+            GameCompletionEntity gameCompletionEntity =
+                    new GameCompletionEntity(gameStateEntity, playerEntityOptional.get());
+            gameCompletionRepository.save(gameCompletionEntity);
+            gameStateEntity.setCompletion(gameCompletionEntity);
+            gameStateRepository.save(gameStateEntity);
             return new GameWinnerDto(gameId, winner);
         }
         return new GameWinnerDto(gameId, null);

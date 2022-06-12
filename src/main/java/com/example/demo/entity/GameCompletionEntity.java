@@ -1,26 +1,27 @@
 package com.example.demo.entity;
 
-import com.sun.istack.NotNull;
-import com.sun.istack.Nullable;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 import javax.persistence.*;
 
 @Data
 @Entity
 @NoArgsConstructor
+@RequiredArgsConstructor
 @Table(name = "game_completion")
 public class GameCompletionEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @NotNull
     @OneToOne
+    @NonNull
     private GameStateEntity game;
 
     @OneToOne
-    @Nullable
+    @NonNull
     private PlayerEntity winner;
 }

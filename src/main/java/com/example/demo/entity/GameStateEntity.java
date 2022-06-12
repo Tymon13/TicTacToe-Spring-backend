@@ -19,7 +19,7 @@ public class GameStateEntity {
 
     @Lob
     @NonNull
-    private byte[] d;
+    private byte[] data;
 
     @OneToOne
     @NonNull
