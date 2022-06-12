@@ -1,37 +1,34 @@
 package com.example.demo.entity;
 
-import com.sun.istack.NotNull;
-import com.sun.istack.Nullable;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 import javax.persistence.*;
-import java.sql.Blob;
-import java.util.List;
 
 @Data
 @Entity
 @NoArgsConstructor
+@RequiredArgsConstructor
 @Table(name = "game_state")
 public class GameStateEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @NotNull
-    @Column(length = 600)
-    private String data;
-
     @Lob
+    @NonNull
     private byte[] d;
 
     @OneToOne
-    @Nullable
-    private GameCompletionEntity completion;
-
-    @OneToOne
+    @NonNull
     private PlayerEntity player1;
 
     @OneToOne
+    @NonNull
     private PlayerEntity player2;
+
+    @OneToOne
+    private GameCompletionEntity completion;
 }

@@ -1,65 +1,122 @@
 package com.example.demo.service;
 
-import com.example.demo.GameDao;
-import com.example.demo.GameProvider;
-import com.example.demo.Player;
+import com.example.demo.dto.GameIdDto;
+import com.example.demo.dto.GameWinnerDto;
+import com.example.demo.entity.GameStateEntity;
+import com.example.demo.entity.PlayerEntity;
 import com.example.demo.exception.GameDoesntExistException;
 import com.example.demo.exception.IllegalMoveException;
+import com.example.demo.exception.InternalErrorException;
+import com.example.demo.exception.PlayerDoesntExist;
+import com.example.demo.repository.GameStateRepository;
+import com.example.demo.repository.PlayerRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.io.*;
+import java.util.Optional;
 
 @Service
 public class GameService {
-    private final GameProvider gameProvider;
     private static final int WIN_CONDITION = 5;
+    private final GameStateRepository gameStateRepository;
+    private final PlayerRepository playerRepository;
 
-    public GameService(GameProvider gameProvider) {
-        this.gameProvider = gameProvider;
+    @Autowired
+    public GameService(GameStateRepository gameStateRepository, PlayerRepository playerRepository) {
+        this.gameStateRepository = gameStateRepository;
+        this.playerRepository = playerRepository;
     }
 
-    public int beginNewGame() {
-        return gameProvider.makeNewGame();
+    public GameIdDto beginNewGame(int player1Id, int player2Id) throws InternalErrorException, PlayerDoesntExist {
+        Optional<PlayerEntity> player1Optional = playerRepository.findById(player1Id);
+        if (player1Optional.isEmpty()) {
+            throw new PlayerDoesntExist();
+        }
+        Optional<PlayerEntity> player2Optional = playerRepository.findById(player2Id);
+        if (player2Optional.isEmpty()) {
+            throw new PlayerDoesntExist();
+        }
+
+        GameStateEntity gameState = new GameStateEntity(encodeGameState(new int[10][10]), player1Optional.get(),
+                player2Optional.get());
+        gameStateRepository.save(gameState);
+        return new GameIdDto(gameState.getId());
     }
 
-    public void playNextMove(int gameId, Player p, int x, int y) throws GameDoesntExistException, IllegalMoveException {
-        GameDao game = gameProvider.getExistingGame(gameId);
-        if (!game.gameInProgress()) {
+    public void playNextMove(int gameId, int playerId, int x, int y)
+            throws GameDoesntExistException, IllegalMoveException, InternalErrorException {
+        Optional<GameStateEntity> gameStateEntityOptional = gameStateRepository.findById(gameId);
+        if (gameStateEntityOptional.isEmpty()) {
             throw new GameDoesntExistException();
         }
-        if (game.getAtXY(x, y) != null) {
+        GameStateEntity gameStateEntity = gameStateEntityOptional.get();
+        if (playerId != gameStateEntity.getPlayer1().getId() && playerId != gameStateEntity.getPlayer2().getId()) {
             throw new IllegalMoveException();
         }
-        game.setAtXY(p, x, y);
+
+        int[][] gameState = decodeGameState(gameStateEntity.getD());
+        if (gameState[x][y] != 0) {
+            throw new IllegalMoveException();
+        }
+        gameState[x][y] = playerId;
+        gameStateEntity.setD(encodeGameState(gameState));
+        gameStateRepository.save(gameStateEntity);
     }
 
-    public Player checkWinner(int gameId) throws GameDoesntExistException {
-        GameDao game = gameProvider.getExistingGame(gameId);
-        Player[][] gameState = game.getGameState();
-
-        Player winner = checkWinner(gameState);
-        if (winner != null) {
-            game.endGame();
+    private int[][] decodeGameState(byte[] data) throws InternalErrorException {
+        ByteArrayInputStream in2 = new ByteArrayInputStream(data);
+        try {
+            return (int[][]) new ObjectInputStream(in2).readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            throw new InternalErrorException();
         }
-        return winner;
     }
 
-    private Player checkWinner(Player[][] gameState) {
-        Player winner;
-        if ((winner = checkWinnerInRows(gameState)) != null) {
+    private byte[] encodeGameState(int[][] gameState) throws InternalErrorException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        try {
+            new ObjectOutputStream(out).writeObject(gameState);
+        } catch (IOException e) {
+            throw new InternalErrorException();
+        }
+        return out.toByteArray();
+    }
+
+    public GameWinnerDto checkWinner(int gameId) throws GameDoesntExistException, InternalErrorException {
+        Optional<GameStateEntity> gameStateEntityOptional = gameStateRepository.findById(gameId);
+        if (gameStateEntityOptional.isEmpty()) {
+            throw new GameDoesntExistException();
+        }
+        GameStateEntity gameStateEntity = gameStateEntityOptional.get();
+        int[][] gameState = decodeGameState(gameStateEntity.getD());
+
+
+        int winner = checkWinner(gameState);
+        if (winner != 0) {
+            return new GameWinnerDto(gameId, winner);
+        }
+        return new GameWinnerDto(gameId, null);
+    }
+
+    private int checkWinner(int[][] gameState) {
+        int winner;
+        if ((winner = checkWinnerInRows(gameState)) != 0) {
             return winner;
         }
-        if ((winner = checkWinnerInColumns(gameState)) != null) {
+        if ((winner = checkWinnerInColumns(gameState)) != 0) {
             return winner;
         }
-        if ((winner = checkWinnerInDiagonals(gameState)) != null) {
+        if ((winner = checkWinnerInDiagonals(gameState)) != 0) {
             return winner;
         }
         winner = checkWinnerInOppositeDiagonals(gameState);
         return winner;
     }
 
-    private Player checkWinnerInRows(Player[][] gameState) {
+    private int checkWinnerInRows(int[][] gameState) {
         for (int i = 0; i < gameState.length; i++) {
-            Player currentCheck = null;
+            int currentCheck = 0;
             int currentCount = 0;
             for (int j = 0; j < gameState[i].length; j++) {
                 if (gameState[i][j] != currentCheck) {
@@ -67,17 +124,17 @@ public class GameService {
                     currentCheck = gameState[i][j];
                 }
                 currentCount++;
-                if (currentCheck != null && currentCount >= WIN_CONDITION) {
+                if (currentCheck != 0 && currentCount >= WIN_CONDITION) {
                     return currentCheck;
                 }
             }
         }
-        return null;
+        return 0;
     }
 
-    private Player checkWinnerInColumns(Player[][] gameState) {
+    private int checkWinnerInColumns(int[][] gameState) {
         for (int j = 0; j < gameState[0].length; j++) {
-            Player currentCheck = null;
+            int currentCheck = 0;
             int currentCount = 0;
             for (int i = 0; i < gameState.length; i++) {
                 if (gameState[i][j] != currentCheck) {
@@ -85,19 +142,19 @@ public class GameService {
                     currentCheck = gameState[i][j];
                 }
                 currentCount++;
-                if (currentCheck != null && currentCount >= WIN_CONDITION) {
+                if (currentCheck != 0 && currentCount >= WIN_CONDITION) {
                     return currentCheck;
                 }
             }
         }
-        return null;
+        return 0;
     }
 
-    private Player checkWinnerInDiagonals(Player[][] gameState) {
+    private int checkWinnerInDiagonals(int[][] gameState) {
         for (int i = 0; i < gameState.length - WIN_CONDITION + 1; i++) {
             for (int j = 0; j < gameState[i].length - WIN_CONDITION + 1; j++) {
-                if (gameState[i][j] != null) {
-                    Player currentCheck = gameState[i][j];
+                if (gameState[i][j] != 0) {
+                    int currentCheck = gameState[i][j];
                     int currentCount = 1;
                     for (; currentCount < WIN_CONDITION; currentCount++) {
                         if (gameState[i + currentCount][j + currentCount] != currentCheck) {
@@ -110,14 +167,14 @@ public class GameService {
                 }
             }
         }
-        return null;
+        return 0;
     }
 
-    private Player checkWinnerInOppositeDiagonals(Player[][] gameState) {
+    private int checkWinnerInOppositeDiagonals(int[][] gameState) {
         for (int i = gameState.length - 1; i > WIN_CONDITION - 1; i--) {
             for (int j = 0; j < gameState[i].length - WIN_CONDITION + 1; j++) {
-                if (gameState[i][j] != null) {
-                    Player currentCheck = gameState[i][j];
+                if (gameState[i][j] != 0) {
+                    int currentCheck = gameState[i][j];
                     int currentCount = 1;
                     for (; currentCount < WIN_CONDITION; currentCount++) {
                         if (gameState[i - currentCount][j + currentCount] != currentCheck) {
@@ -130,6 +187,7 @@ public class GameService {
                 }
             }
         }
-        return null;
+        return 0;
     }
+
 }
