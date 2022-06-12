@@ -17,6 +17,7 @@ public class PlayerController {
 
     @PostMapping(path = "/player/new")
     public PlayerDto addPlayer(@RequestParam String name) {
+        // @RequestBody instead of RequestParam
         return playerService.add(name);
     }
 
