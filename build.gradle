@@ -41,6 +41,13 @@ task hello_world {
 	}
 }
 
+spotbugs {
+	toolVersion = '4.7.0'
+	ignoreFailures = false
+	showStackTraces = true
+	showProgress = true
+}
+
 description ="""
 Ultimate Tic-Tac-Toe
 Play through the Internet on a 10x10 board
