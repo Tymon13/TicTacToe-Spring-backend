@@ -59,7 +59,7 @@ public class GameService {
         if (playerId != gameStateEntity.getPlayer1().getId() && playerId != gameStateEntity.getPlayer2().getId()) {
             throw new IllegalMoveException();
         }
-        if(gameStateEntity.getCompletion() != null) {
+        if (gameStateEntity.getCompletion() != null) {
             throw new IllegalMoveException();
         }
 
@@ -104,12 +104,12 @@ public class GameService {
 
         if (winner != 0) {
             Optional<PlayerEntity> playerEntityOptional = playerRepository.findById(winner);
-            if(playerEntityOptional.isEmpty()) {
+            if (playerEntityOptional.isEmpty()) {
                 throw new InternalErrorException();
             }
 
-            GameCompletionEntity gameCompletionEntity =
-                    new GameCompletionEntity(gameStateEntity, playerEntityOptional.get());
+            GameCompletionEntity gameCompletionEntity = new GameCompletionEntity(gameStateEntity);
+            gameCompletionEntity.setWinner(playerEntityOptional.get());
             gameCompletionRepository.save(gameCompletionEntity);
             gameStateEntity.setCompletion(gameCompletionEntity);
             gameStateRepository.save(gameStateEntity);

@@ -22,6 +22,5 @@ public class GameCompletionEntity {
     private GameStateEntity game;
 
     @OneToOne
-    @NonNull
     private PlayerEntity winner;
 }
